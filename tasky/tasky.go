@@ -6,7 +6,7 @@ const (
 	Cancel Action = iota
 	Pause
 	Resume
-	Rerun
+	Restart
 )
 
 type Worker interface {
@@ -26,7 +26,7 @@ type Worker interface {
 	Signal(Action) bool
 
 	// Worker statistics like number of tasks performed, failure rate,
-	// avaerage time per task etc
+	// average time per task etc
 	Statistics() string
 }
 
