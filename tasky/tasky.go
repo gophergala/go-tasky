@@ -258,18 +258,17 @@ func handlerListWorkers(rw http.ResponseWriter, r *http.Request) {
 }
 
 func RegisterTaskyHandlers(r *mux.Router) {
+	r.StrictSlash(true) //enables matching a route with or without a trailing slash
+	//Handles /tasky/v1 routes. Create new subrouters off this
 	tr := r.PathPrefix(apiBase).Subrouter()
 
-	ws := tr.Path("/workers").Subrouter()
-	ws.Methods("GET").HandlerFunc(handlerListWorkers)
+	workersRtr := tr.PathPrefix("/workers").Subrouter()
+	workersRtr.HandleFunc("/", handlerListWorkers).Methods("GET")
+	workersRtr.HandleFunc("/{name}", handlerNewTask).Methods("POST")
 
-	w := tr.PathPrefix("/workers/{name}").Subrouter()
-	w.Methods("POST").HandlerFunc(handlerNewTask)
-
-	ts := tr.Path("/task").Subrouter()
-	ts.Methods("GET").HandlerFunc(handlerListTasks)
-
-	t := tr.PathPrefix("/task/{id}").Subrouter()
-	t.Methods("GET").Path("/status").HandlerFunc(handlerGetTaskStatus)
-	t.Methods("POST").Path("/cancel").HandlerFunc(handlerCancelTask)
+	tasksRtr := tr.PathPrefix("/tasks").Subrouter()
+	tasksRtr.HandleFunc("/", handlerListTasks).Methods("GET")
+	// tasksRtr.HandleFunc("/{id:[0-9a-f]+}", handlerGetTaskInfo).Methods("GET")
+	tasksRtr.HandleFunc("/{id:[0-9a-f]+}/status", handlerGetTaskStatus).Methods("GET")
+	tasksRtr.HandleFunc("/{id:[0-9a-f]+}/cancel", handlerCancelTask).Methods("POST")
 }
