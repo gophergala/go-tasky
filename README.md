@@ -1,7 +1,11 @@
 #Go-Tasky
-![go-tasky-logo](https://cloud.githubusercontent.com/assets/3473592/5893581/5a90b250-a4af-11e4-84a4-1a1b14ebc54d.png)
+<p align="center">
+<img src="https://cloud.githubusercontent.com/assets/3473592/5893581/5a90b250-a4af-11e4-84a4-1a1b14ebc54d.png" alt="go-tasky-logo"/>
+</p>
 
-Go-Tasky is a simple go package that makes it easy to execute tasks on your server that are exposed with a RESTful api. Developed for the gophergala global hackathon 2015.  
+Go-Tasky is a simple golang package that makes it easy to create and execute tasks on a server that are exposed with a RESTful api.  Think of Go-Tasky as your drop-in server companion tool, for when you need to expose the information you need via friendly APIs.
+
+Developed by [Mark Moudy](https://github.com/MarkMoudy) and [Mehul Choube](https://github.com/mchoube) during the 2015 Gophergala global hackathon.  
 
 ##Basic Principles
 
