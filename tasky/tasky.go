@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 	"sync"
 
 	"github.com/gorilla/mux"
@@ -71,7 +72,7 @@ func NewWorker(w Worker) (Worker, error) {
 	tw := &taskyWorker{}
 	tw.w = w
 
-	name := w.Name()
+	name := strings.ToLower(w.Name())
 
 	wMut.Lock()
 	workers[name] = tw
