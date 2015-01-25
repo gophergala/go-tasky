@@ -41,7 +41,7 @@ GET /tasky/v1/tasks/ - Returns a list of all tasks.
 GET /tasky/v1/tasks/{id}/status - Returns the status of a task.  
 POST /tasky/v1/tasks/{id}/cancel - Cancel the task.   
 
-TODO:
+TODO:  
 PUT /tasky/v1/task/{task_id} - Update the configuration of the task.  
 POST /tasky/v1/task/{task_id}/actions - Modify the state of the task (cancel, pause, resume, run)  
 GET /tasky/v1/task/{task_id}/statistics - returns the statistics about the task, such as time to complete task  
