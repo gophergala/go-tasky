@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/davecgh/go-spew/spew"
 	"log"
 	"net/http"
 
@@ -29,6 +30,7 @@ func register() {
 	}
 	fmt.Println("cp: ", tw)
 	fmt.Println("info: ", string(tw.Usage()))
+	spew.Dump("Details", tw.Details())
 
 	i := &workers.Ifconfig{}
 
@@ -38,14 +40,14 @@ func register() {
 	}
 	fmt.Println("i: ", tw2)
 
-	s := &workers.Sleeper{}
+	// s := &workers.Sleeper{}
 
-	tw3, err := tasky.NewWorker(s)
-	if err != nil {
-		log.Fatalf("error: %v", err)
-	}
-	fmt.Println("s: ", tw3)
-	return
+	// tw3, err := tasky.NewWorker(s)
+	// if err != nil {
+	// 	log.Fatalf("error: %v", err)
+	// }
+	// fmt.Println("s: ", tw3)
+	// return
 }
 
 func main() {

@@ -28,7 +28,22 @@ const (
 	Restart
 )
 
+//WorkerDetails is an object that describes the worker
+type WorkerDetails struct {
+	// Name of the worker
+	Name string `json:"name"`
+
+	// human readable description of the worker
+	Description string `json:"description"`
+
+	//an config struct for all config values
+	Config interface{} `json:"config_objects,omitempty"`
+}
+
 type Worker interface {
+	// Details provides all metadata info about the worker and it's config
+	Details() *WorkerDetails
+
 	// Worker name
 	Name() string
 
@@ -253,9 +268,18 @@ func handlerNewTask(rw http.ResponseWriter, r *http.Request) {
 }
 
 func handlerListWorkers(rw http.ResponseWriter, r *http.Request) {
-	jsonStr, _ := listWorkers()
+	// jsonStr, _ := listWorkers()
 
-	fmt.Fprintf(rw, "%s\n", jsonStr)
+	listWorkers, err := listWorkerDetails()
+	if err != nil {
+		rw.WriteHeader(http.StatusNoContent)
+		return
+	}
+	rw.Header().Set("Content-Type", "application/json")
+	RespondJSON(rw, r, listWorkers)
+	return
+
+	// fmt.Fprintf(rw, "%s\n", jsonStr)
 }
 
 func RegisterTaskyHandlers(r *mux.Router) {
@@ -272,4 +296,16 @@ func RegisterTaskyHandlers(r *mux.Router) {
 	// tasksRtr.HandleFunc("/{id:[0-9a-f]+}", handlerGetTaskInfo).Methods("GET")
 	tasksRtr.HandleFunc("/{id:[0-9a-f]+}/status", handlerGetTaskStatus).Methods("GET")
 	tasksRtr.HandleFunc("/{id:[0-9a-f]+}/cancel", handlerCancelTask).Methods("POST")
+}
+
+func RespondJSON(w http.ResponseWriter, req *http.Request, v interface{}, code ...int) error {
+	if code != nil {
+		w.WriteHeader(code[0])
+	}
+	err := json.NewEncoder(w).Encode(v)
+	if err != nil {
+		//encoding failed
+		panic(err)
+	}
+	return err
 }

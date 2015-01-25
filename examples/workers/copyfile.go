@@ -13,16 +13,24 @@ type CopyFile struct {
 }
 
 type cp struct {
-	Src string
-	Dst string
+	Src string `json:"source"`
+	Dst string `json:"destination"`
 }
 
 type cpUsage struct {
-	Usage cp
+	Usage cp `json:"usage"`
 }
 
 type cpError struct {
 	Error string
+}
+
+func (d *CopyFile) Details() *tasky.WorkerDetails {
+	return &tasky.WorkerDetails{
+		Name:        "CopyFile",
+		Description: "CopyFile will copy a file on the server. You must specify the Source and Destination",
+		Config:      cp{},
+	}
 }
 
 func (d *CopyFile) Name() string {

@@ -8,11 +8,18 @@ import (
 )
 
 type Ifconfig struct {
-	IName        string
-	HardwareAddr string
-	Ipnet        string
+	IName        string `json:"interface_name"`
+	HardwareAddr string `json:"mac_address"`
+	Ipnet        string `json:"ip_network"`
 }
 
+func (d *Ifconfig) Details() *tasky.WorkerDetails {
+	return &tasky.WorkerDetails{
+		Name:        "Ifconfig",
+		Description: "Ifconfig will return networking details from the server. No config is needed for this worker",
+		Config:      nil,
+	}
+}
 func (d *Ifconfig) Name() string {
 	return "Ifconfig"
 }

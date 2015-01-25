@@ -2,12 +2,17 @@ package tasky
 
 import (
 	"encoding/json"
-	"strings"
+	"errors"
+	"github.com/davecgh/go-spew/spew"
 )
 
 type taskyWorker struct {
 	w     Worker
 	tasks []string
+}
+
+func (tw *taskyWorker) Details() *WorkerDetails {
+	return tw.w.Details()
 }
 
 func (tw *taskyWorker) Name() string {
@@ -40,7 +45,25 @@ type worker struct {
 }
 
 type ws struct {
-	Workers []worker `json:"workers"`
+	Workers []worker `json:"workers,omitempty"`
+}
+
+func listWorkerDetails() ([]WorkerDetails, error) {
+	wMut.RLock()
+	if len(workers) == 0 {
+		wMut.RUnlock()
+		return nil, errors.New("No Registered workers were found.")
+	}
+	workersDetailList := make([]WorkerDetails, len(workers))
+	i := 0
+	for _, wdetails := range workers {
+		spew.Dump(wdetails)
+		workersDetailList[i] = *wdetails.Details()
+		i++
+	}
+	wMut.RUnlock()
+
+	return workersDetailList, nil
 }
 
 // methods for routes to invoke
