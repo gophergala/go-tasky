@@ -113,7 +113,7 @@ func handlerGetTaskStatus(rw http.ResponseWriter, r *http.Request) {
 		estr, _ := json.Marshal(e)
 		log.Println("estr: ", estr)
 		fmt.Fprintf(rw, "%s\n", estr)
-		rw.WriteHeader(http.StatusInternalServerError)
+		rw.WriteHeader(http.StatusNoContent)
 		return
 	}
 
@@ -211,7 +211,7 @@ func handlerNewTask(rw http.ResponseWriter, r *http.Request) {
 		estr, _ := json.Marshal(e)
 		log.Println("estr: ", estr)
 		fmt.Fprintf(rw, "%s\n", estr)
-		rw.WriteHeader(http.StatusInternalServerError)
+		rw.WriteHeader(http.StatusNoContent)
 		return
 	}
 
