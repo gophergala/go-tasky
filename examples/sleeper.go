@@ -9,14 +9,14 @@ import (
 type Sleeper struct {
 }
 
-func (d *Sleeper) Info() string {
+func (d *Sleeper) Name() string {
+	return "Sleeper"
+}
+
+func (d *Sleeper) Usage() string {
 	s := "{\"Usage\":{}}"
 
 	return s
-}
-
-func (d *Sleeper) Services() []byte {
-	return nil
 }
 
 func (d *Sleeper) Perform(job []byte, dataCh chan []byte, errCh chan error, quitCh chan bool) {
@@ -36,14 +36,14 @@ func (d *Sleeper) Perform(job []byte, dataCh chan []byte, errCh chan error, quit
 	}
 }
 
-func (d *Sleeper) Status() []byte {
-	return nil
+func (d *Sleeper) Status() string {
+	return tasky.Enabled
 }
 
 func (d *Sleeper) Signal(act tasky.Action) bool {
 	return true
 }
 
-func (d *Sleeper) Statistics() []byte {
-	return nil
+func (d *Sleeper) MaxNumTasks() uint64 {
+	return 10
 }

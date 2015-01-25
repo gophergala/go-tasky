@@ -17,7 +17,7 @@ func register() {
 		log.Fatalf("error: %v", err)
 	}
 	fmt.Println("cp: ", tw)
-	fmt.Println("info: ", string(tw.Info()))
+	fmt.Println("info: ", string(tw.Usage()))
 
 	i := &Ifconfig{}
 

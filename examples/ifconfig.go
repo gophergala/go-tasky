@@ -8,19 +8,19 @@ import (
 )
 
 type Ifconfig struct {
-	Name         string
+	IName        string
 	HardwareAddr string
 	Ipnet        string
 }
 
-func (d *Ifconfig) Info() string {
+func (d *Ifconfig) Name() string {
+	return "Ifconfig"
+}
+
+func (d *Ifconfig) Usage() string {
 	s := "{\"Usage\":{}}"
 
 	return s
-}
-
-func (d *Ifconfig) Services() []byte {
-	return nil
 }
 
 type ifs struct {
@@ -62,7 +62,7 @@ func (d *Ifconfig) Perform(job []byte, dataCh chan []byte, errCh chan error, qui
 				}
 
 				ii := Ifconfig{}
-				ii.Name = iface.Name
+				ii.IName = iface.Name
 				ii.HardwareAddr = iface.HardwareAddr.String()
 				ii.Ipnet = ipnet.String()
 
@@ -95,14 +95,14 @@ func (d *Ifconfig) Perform(job []byte, dataCh chan []byte, errCh chan error, qui
 	}
 }
 
-func (d *Ifconfig) Status() []byte {
-	return nil
+func (d *Ifconfig) Status() string {
+	return tasky.Enabled
 }
 
 func (d *Ifconfig) Signal(act tasky.Action) bool {
 	return true
 }
 
-func (d *Ifconfig) Statistics() []byte {
-	return nil
+func (d *Ifconfig) MaxNumTasks() uint64 {
+	return 10
 }
