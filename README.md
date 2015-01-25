@@ -150,11 +150,37 @@ Get Result of a task:
 ```go
 curl -X POST -H "Content-Type: application/json" -d '{}' http://localhost:8888/tasky/v1/workers/ifconfig | python -mjson.tool
 {
-    "TaskId": "1acb0ad6c8fb4d4faa7aa0e1d0f5f0b6"
+    "TaskId": "ac2d1192bd4d46e48207956554aa230f"
 }
 
-curl http://localhost:8888/tasky/v1/tasks/1acb0ad6c8fb4d4faa7aa0e1d0f5f0b6/result 
-{"Output":"{\"Interfaces\":[{\"interface_name\":\"lo\",\"mac_address\":\"\",\"ip_network\":\"127.0.0.1/8\"},{\"interface_name\":\"lo\",\"mac_address\":\"\",\"ip_network\":\"::1/128\"},{\"interface_name\":\"eth0\",\"mac_address\":\"f0:de:f1:4c:3a:ee\",\"ip_network\":\"172.24.20.26/23\"},{\"interface_name\":\"eth0\",\"mac_address\":\"f0:de:f1:4c:3a:ee\",\"ip_network\":\"fe80::f2de:f1ff:fe4c:3aee/64\"}]}","TaskId":"1acb0ad6c8fb4d4faa7aa0e1d0f5f0b6"}
+curl http://localhost:8888/tasky/v1/tasks/ac2d1192bd4d46e48207956554aa230f/result | python -mjson.tool
+{
+    "Output": {
+        "Interfaces": [
+            {
+                "interface_name": "lo",
+                "ip_network": "127.0.0.1/8",
+                "mac_address": ""
+            },
+            {
+                "interface_name": "lo",
+                "ip_network": "::1/128",
+                "mac_address": ""
+            },
+            {
+                "interface_name": "eth0",
+                "ip_network": "172.24.20.26/23",
+                "mac_address": "f0:de:f1:4c:3a:ee"
+            },
+            {
+                "interface_name": "eth0",
+                "ip_network": "fe80::f2de:f1ff:fe4c:3aee/64",
+                "mac_address": "f0:de:f1:4c:3a:ee"
+            }
+        ]
+    },
+    "TaskId": "ac2d1192bd4d46e48207956554aa230f"
+}
 ```
 
 ## Worker Interface
