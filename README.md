@@ -34,7 +34,8 @@ GET /tasky/v1/{worker_name}/statistics - returns statistics for the worker like 
 
 Tasks:  
 GET /tasky/v1/tasks/ - Returns a list of all tasks.  
-GET /tasky/v1/tasks/{id}/status - Returns the status of a task.  
+GET /tasky/v1/tasks/{id}/status - Returns the status of a task. 
+POST /tasky/v1/tasks/{id}/cancel - Cancel the task.   
 
 TODO:
 PUT /tasky/v1/task/{task_id} - Update the configuration of the task.  
