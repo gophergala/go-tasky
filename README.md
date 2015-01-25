@@ -19,8 +19,12 @@ go run main.go
 ## Example Workers
 - CopyFile - copy a file to a new location  
 - Ifconfig - fetch network information read the contents of a file  
-- sleeper -  Sleep and wait?
-- check the values of system settings  
+- sleeper -  Sleep and wait
+
+##Roadmap
+-serve a gui web interface alongside the api for point and click task management
+- expand selection of example workers
+- Chaining of tasks so you can specify a sequence of tasks to run.  
 
 ##Routes
 
@@ -153,34 +157,48 @@ curl -X POST -H "Content-Type: application/json" -d '{}' http://localhost:8888/t
     "TaskId": "ac2d1192bd4d46e48207956554aa230f"
 }
 
-curl http://localhost:8888/tasky/v1/tasks/ac2d1192bd4d46e48207956554aa230f/result | python -mjson.tool
+curl http://localhost:8888/tasky/v1/tasks/1acb0ad6c8fb4d4faa7aa0e1d0f5f0b6/result 
 {
     "Output": {
         "Interfaces": [
             {
-                "interface_name": "lo",
-                "ip_network": "127.0.0.1/8",
-                "mac_address": ""
-            },
-            {
-                "interface_name": "lo",
+                "interface_name": "lo0",
                 "ip_network": "::1/128",
                 "mac_address": ""
             },
             {
-                "interface_name": "eth0",
-                "ip_network": "172.24.20.26/23",
-                "mac_address": "f0:de:f1:4c:3a:ee"
+                "interface_name": "lo0",
+                "ip_network": "127.0.0.1/8",
+                "mac_address": ""
             },
             {
-                "interface_name": "eth0",
-                "ip_network": "fe80::f2de:f1ff:fe4c:3aee/64",
-                "mac_address": "f0:de:f1:4c:3a:ee"
+                "interface_name": "lo0",
+                "ip_network": "fe80::1/64",
+                "mac_address": ""
+            },
+            {
+                "interface_name": "en0",
+                "ip_network": "fe80::6203:8ff:fe9b:814a/64",
+                "mac_address": "60:03:08:9b:81:4a"
+            },
+            {
+                "interface_name": "en0",
+                "ip_network": "192.168.1.6/24",
+                "mac_address": "60:03:08:9b:81:4a"
+            },
+            {
+                "interface_name": "awdl0",
+                "ip_network": "fe80::6089:27ff:fef1:b73c/64",
+                "mac_address": "62:89:27:f1:b7:3c"
+            },
+            {
+                "interface_name": "vboxnet9",
+                "ip_network": "192.168.59.3/24",
+                "mac_address": "0a:00:27:00:00:09"
             }
         ]
     },
-    "TaskId": "ac2d1192bd4d46e48207956554aa230f"
-}
+    "TaskId": "6d8b4b6e3e0942faa2fcfe0f9a8757d7"
 ```
 
 ## Worker Interface
