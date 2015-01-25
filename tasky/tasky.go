@@ -100,6 +100,26 @@ type tstat struct {
 	Status string
 }
 
+func handlerCancelTask(rw http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	log.Println("id: ", id)
+
+	tMut.RLock()
+	t, ok := tasks[id]
+	tMut.RUnlock()
+
+	if !ok {
+		e := TaskyError{"Could not found a task with given id"}
+		estr, _ := json.Marshal(e)
+		log.Println("estr: ", estr)
+		fmt.Fprintf(rw, "%s\n", estr)
+		rw.WriteHeader(http.StatusNoContent)
+		return
+	}
+
+	t.cancel()
+}
+
 func handlerGetTaskStatus(rw http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	log.Println("id: ", id)
@@ -150,19 +170,21 @@ func newTask(w Worker, job []byte) taskid {
 }
 
 type ts struct {
-	Tasks []taskid
+	Tasks []tstat
 }
 
 func listTasks() ts {
 	t := ts{}
 
 	tMut.RLock()
-	for k, _ := range tasks {
+	for k, v := range tasks {
+		s := v.status()
+
 		if len(t.Tasks) <= 0 {
-			t.Tasks = make([]taskid, 1)
-			t.Tasks[0] = taskid{k}
+			t.Tasks = make([]tstat, 1)
+			t.Tasks[0] = tstat{k, s}
 		} else {
-			t.Tasks = append(t.Tasks, taskid{k})
+			t.Tasks = append(t.Tasks, tstat{k, s})
 		}
 	}
 	tMut.RUnlock()
@@ -249,4 +271,5 @@ func RegisterTaskyHandlers(r *mux.Router) {
 
 	t := tr.PathPrefix("/task/{id}").Subrouter()
 	t.Methods("GET").Path("/status").HandlerFunc(handlerGetTaskStatus)
+	t.Methods("POST").Path("/cancel").HandlerFunc(handlerCancelTask)
 }
