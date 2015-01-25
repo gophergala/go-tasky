@@ -6,8 +6,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/davecgh/go-spew/spew"
-
 	"github.com/gophergala/go-tasky/examples/workers"
 	"github.com/gophergala/go-tasky/tasky"
 	"github.com/gorilla/mux"
@@ -22,32 +20,28 @@ func init() {
 	flag.Parse()
 }
 
+//register all of your custom workers here.
 func register() {
 	cp := &workers.CopyFile{}
-
-	tw, err := tasky.NewWorker(cp)
+	taskyCopy, err := tasky.NewWorker(cp)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
-	fmt.Println("cp: ", tw)
-	fmt.Println("info: ", string(tw.Usage()))
-	spew.Dump("Details", tw.Details())
+	fmt.Printf("copyFile Details: %+v\n\n", taskyCopy.Details())
 
-	i := &workers.Ifconfig{}
-
-	tw2, err := tasky.NewWorker(i)
+	ifconf := &workers.Ifconfig{}
+	taskyifconfig, err := tasky.NewWorker(ifconf)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
-	fmt.Println("i: ", tw2)
+	fmt.Printf("ifconfig worker: %+v\n\n", taskyifconfig.Details())
 
-	s := &workers.Sleeper{}
-
-	tw3, err := tasky.NewWorker(s)
+	sleeper := &workers.Sleeper{}
+	taskySleeper, err := tasky.NewWorker(sleeper)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
-	fmt.Println("s: ", tw3)
+	fmt.Printf("sleeper worker: %+v\n\n", taskySleeper.Details())
 }
 
 func main() {
@@ -57,6 +51,7 @@ func main() {
 
 	tasky.RegisterTaskyHandlers(r)
 	log.Println("Starting Tasky server at", serverAddr)
+
 	err := http.ListenAndServe(serverAddr, r)
 	if err != nil {
 		log.Println("Error Starting Tasky Server: ", err.Error())
