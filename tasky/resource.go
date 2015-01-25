@@ -3,8 +3,8 @@ package tasky
 import (
 	"fmt"
 	// "github.com/gorilla/mux"
-	// "encoding/json"
-	// "net/http"
+	"encoding/json"
+	"net/http"
 	// "strings"
 	"sync"
 )
@@ -37,17 +37,17 @@ func (r *Resources) RegisterWorker(workerName string, worker Worker) error {
 	return nil
 }
 
-// func RespondJSON(w http.ResponseWriter, req *http.Request, v interface{}, code ...int) error {
-// 	if code != nil {
-// 		w.WriteHeader(code[0])
-// 	}
-// 	err := json.NewEncoder(w).Encode(v)
-// 	if err != nil {
-// 		//encoding failed
-// 		panic(err)
-// 	}
-// 	return err
-// }
+func RespondJSON(w http.ResponseWriter, req *http.Request, v interface{}, code ...int) error {
+	if code != nil {
+		w.WriteHeader(code[0])
+	}
+	err := json.NewEncoder(w).Encode(v)
+	if err != nil {
+		//encoding failed
+		panic(err)
+	}
+	return err
+}
 
 // type BaseResource interface {
 // 	Index(http.ResponseWriter, *http.Request)
