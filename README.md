@@ -32,7 +32,7 @@ Workers:
 GET /tasky/v1/workers/ - returns a list of available worker endpoints   
 POST /tasky/v1/workers/{worker_name} - Creates a task to run.  
 
-TODO:
+TODO:  
 GET /tasky/v1/workers/{worker_name}/info - returns a description of the worker and it's usage   
 GET /tasky/v1/{worker_name}/statistics - returns statistics for the worker like number of tasks performed, failure rate, average time take per task etc  
 
