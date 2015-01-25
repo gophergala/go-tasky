@@ -22,7 +22,7 @@ func (d *Sleeper) Usage() string {
 func (d *Sleeper) Perform(job []byte, dataCh chan []byte, errCh chan error, quitCh chan bool) {
 	done := make(chan bool)
 	go func() {
-		time.Sleep(5 * time.Minute)
+		time.Sleep(1 * time.Minute)
 		dataCh <- []byte("Done sleeping.")
 		done <- true
 	}()

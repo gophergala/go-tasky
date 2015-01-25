@@ -112,8 +112,48 @@ type taskid struct {
 }
 
 type tstat struct {
-	TaskId string
-	Status string
+	TaskId   string
+	Status   string
+	Duration string `json:"Duration,omitempty"`
+}
+
+func handlerGetTaskOutput(rw http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	log.Println("id: ", id)
+
+	tMut.RLock()
+	t, ok := tasks[id]
+	tMut.RUnlock()
+
+	if !ok {
+		e := TaskyError{"Could not found a task with given id"}
+		estr, _ := json.Marshal(e)
+		log.Println("estr: ", estr)
+		fmt.Fprintf(rw, "%s\n", estr)
+		rw.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	output := string(t.result())
+
+	if len(output) > 0 {
+		js := make(map[string]interface{})
+
+		js["TaskId"] = id
+		js["Output"] = output
+
+		jsonStr, err := json.Marshal(js)
+		if err != nil {
+			e := TaskyError{err.Error()}
+			estr, _ := json.Marshal(e)
+			log.Println("estr: ", estr)
+			fmt.Fprintf(rw, "%s\n", estr)
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Fprintf(rw, "%s\n", string(jsonStr))
+	}
 }
 
 func handlerCancelTask(rw http.ResponseWriter, r *http.Request) {
@@ -129,7 +169,7 @@ func handlerCancelTask(rw http.ResponseWriter, r *http.Request) {
 		estr, _ := json.Marshal(e)
 		log.Println("estr: ", estr)
 		fmt.Fprintf(rw, "%s\n", estr)
-		rw.WriteHeader(http.StatusNoContent)
+		rw.WriteHeader(http.StatusNotFound)
 		return
 	}
 
@@ -149,13 +189,22 @@ func handlerGetTaskStatus(rw http.ResponseWriter, r *http.Request) {
 		estr, _ := json.Marshal(e)
 		log.Println("estr: ", estr)
 		fmt.Fprintf(rw, "%s\n", estr)
-		rw.WriteHeader(http.StatusNoContent)
+		rw.WriteHeader(http.StatusNotFound)
 		return
 	}
 
 	s := t.status()
 
-	ts := tstat{id, s}
+	var durStr string
+
+	if s != Running {
+		d := t.duration()
+		if d > 0 {
+			durStr = fmt.Sprintf("%v", d)
+		}
+	}
+
+	ts := tstat{id, s, durStr}
 	log.Println("ts: ", ts)
 	jsonStr, err := json.Marshal(ts)
 	if err != nil {
@@ -195,12 +244,23 @@ func listTasks() ts {
 	tMut.RLock()
 	for k, v := range tasks {
 		s := v.status()
+		log.Println("s: ", s)
+
+		durStr := ""
+
+		if s != Running {
+			d := v.duration()
+			log.Println("d: ", d)
+			if d > 0 {
+				durStr = fmt.Sprintf("%v", d)
+			}
+		}
 
 		if len(t.Tasks) <= 0 {
 			t.Tasks = make([]tstat, 1)
-			t.Tasks[0] = tstat{k, s}
+			t.Tasks[0] = tstat{k, s, durStr}
 		} else {
-			t.Tasks = append(t.Tasks, tstat{k, s})
+			t.Tasks = append(t.Tasks, tstat{k, s, durStr})
 		}
 	}
 	tMut.RUnlock()
@@ -211,6 +271,7 @@ func listTasks() ts {
 func handlerListTasks(rw http.ResponseWriter, r *http.Request) {
 	t := listTasks()
 	log.Println("tasks: ", t)
+
 	jsonStr, err := json.Marshal(t)
 	if err != nil {
 		e := TaskyError{err.Error()}
@@ -249,7 +310,7 @@ func handlerNewTask(rw http.ResponseWriter, r *http.Request) {
 		estr, _ := json.Marshal(e)
 		log.Println("estr: ", estr)
 		fmt.Fprintf(rw, "%s\n", estr)
-		rw.WriteHeader(http.StatusNoContent)
+		rw.WriteHeader(http.StatusNotFound)
 		return
 	}
 
@@ -296,6 +357,7 @@ func RegisterTaskyHandlers(r *mux.Router) {
 	// tasksRtr.HandleFunc("/{id:[0-9a-f]+}", handlerGetTaskInfo).Methods("GET")
 	tasksRtr.HandleFunc("/{id:[0-9a-f]+}/status", handlerGetTaskStatus).Methods("GET")
 	tasksRtr.HandleFunc("/{id:[0-9a-f]+}/cancel", handlerCancelTask).Methods("POST")
+	tasksRtr.HandleFunc("/{id:[0-9a-f]+}/result", handlerGetTaskOutput).Methods("GET")
 }
 
 func RespondJSON(w http.ResponseWriter, req *http.Request, v interface{}, code ...int) error {
