@@ -45,6 +45,29 @@ GET /tasky/v1/task/{task_id}/statistics - returns the statistics about the task,
 RuleChains:  
 For later, but used to chain multiple tasks together in an ordered fashion.  
 
+## Example
+List of workers available:  
+```go
+curl http://localhost:8888/tasky/v1/workers/ | python -mjson.tool 
+{
+    "workers": [
+        {
+            "name": "copyfile",
+            "usage": "{\"Usage\":{\"Src\":\"\\u003csource file\\u003e\",\"Dst\":\"destination file\\u003e\"}}"
+        },
+        {
+            "name": "ifconfig",
+            "usage": "{\"Usage\":{}}"
+        },
+        {
+            "name": "sleeper",
+            "usage": "{\"Usage\":{}}"
+        }
+    ]
+}
+
+```
+
 ## Worker Interface
 Create a custom worker by implementing the worker interface:  
 ```go
