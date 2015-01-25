@@ -1,6 +1,9 @@
 package tasky
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"strings"
+)
 
 type taskyWorker struct {
 	w     Worker
@@ -32,12 +35,12 @@ func (tw *taskyWorker) MaxNumTasks() uint64 {
 }
 
 type worker struct {
-	Id    string
-	Usage string
+	Id    string `json:"name"`
+	Usage string `json:"usage"`
 }
 
 type ws struct {
-	Workers []worker
+	Workers []worker `json:"workers"`
 }
 
 // methods for routes to invoke
