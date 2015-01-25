@@ -1,11 +1,20 @@
 #Go-Tasky
-Tasky is a simple go tool that makes it easy to expose server side tasks with a RESTful api. Developed for the gophergala global hackathon. 
-
-NOTE: this is preliminary ideas and nothing is set in stone. Consider it brainstorming via readme.
+Go-Tasky is a simple go package that makes it easy to execute tasks on your server that are exposed with a RESTful api. Developed for the gophergala global hackathon 2015.  
 
 ##Basic Principles
 
-Register a task with go-tasky that implements the worker interface and a set of routes will be created for that task. You can have any number of uniquely configured tasks for a worker. The go-tasky app would run on your server and expose api endpoints.  
+Register a task with go-tasky that implements the worker interface and a set of routes will be created for that task. You can have any number of uniquely configured tasks for a worker. Go-Tasky runs on your server and expose api endpoints. 
+
+##Getting Started
+Install Go-Tasky in your $GOPATH with `go get`  
+```Go
+go get -u github.com/gophergala/go-tasky
+```
+Navigate to the examples directory and run  
+```Go
+// use the -addr flag to set server address(default is :8888) ex. -addr=:4444
+go run main.go 
+```
 
 ##Workers
 - copy a file to a new location  
