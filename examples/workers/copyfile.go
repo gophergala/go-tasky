@@ -6,7 +6,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/gophergala/go-tasky/tasky"
+	"github.com/gophergala/go-tasky"
 )
 
 type CopyFile struct {

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net"
 
-	"github.com/gophergala/go-tasky/tasky"
+	"github.com/gophergala/go-tasky"
 )
 
 type Ifconfig struct {

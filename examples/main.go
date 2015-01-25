@@ -8,8 +8,8 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 
+	"github.com/gophergala/go-tasky"
 	"github.com/gophergala/go-tasky/examples/workers"
-	"github.com/gophergala/go-tasky/tasky"
 	"github.com/gorilla/mux"
 )
 

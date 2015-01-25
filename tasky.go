@@ -120,7 +120,6 @@ type tstat struct {
 
 func handlerGetTaskOutput(rw http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
-	log.Println("id: ", id)
 
 	tMut.RLock()
 	t, ok := tasks[id]
@@ -129,7 +128,6 @@ func handlerGetTaskOutput(rw http.ResponseWriter, r *http.Request) {
 	if !ok {
 		e := TaskyError{"Could not found a task with given id"}
 		estr, _ := json.Marshal(e)
-		log.Println("estr: ", estr)
 		fmt.Fprintf(rw, "%s\n", estr)
 		rw.WriteHeader(http.StatusNotFound)
 		return
@@ -139,7 +137,7 @@ func handlerGetTaskOutput(rw http.ResponseWriter, r *http.Request) {
 		results := make(map[string]interface{})
 		err := json.Unmarshal(t.result(), &results)
 		if err != nil {
-			log.Println("Tasky.go_handlerGetTaskOutput - Error Unmarshaling Task Result: ", err.Error())
+			//log.Println("Tasky.go_handlerGetTaskOutput - Error Unmarshaling Task Result: ", err.Error())
 			results["string_output"] = string(t.result()) //last ditch effort to save the data
 		}
 		js := make(map[string]interface{})
@@ -151,7 +149,6 @@ func handlerGetTaskOutput(rw http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			e := TaskyError{err.Error()}
 			estr, _ := json.Marshal(e)
-			log.Println("estr: ", estr)
 			fmt.Fprintf(rw, "%s\n", estr)
 			rw.WriteHeader(http.StatusInternalServerError)
 			return
@@ -163,7 +160,6 @@ func handlerGetTaskOutput(rw http.ResponseWriter, r *http.Request) {
 
 func handlerCancelTask(rw http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
-	log.Println("id: ", id)
 
 	tMut.RLock()
 	t, ok := tasks[id]
@@ -172,7 +168,6 @@ func handlerCancelTask(rw http.ResponseWriter, r *http.Request) {
 	if !ok {
 		e := TaskyError{"Could not found a task with given id"}
 		estr, _ := json.Marshal(e)
-		log.Println("estr: ", estr)
 		fmt.Fprintf(rw, "%s\n", estr)
 		rw.WriteHeader(http.StatusNotFound)
 		return
@@ -183,7 +178,6 @@ func handlerCancelTask(rw http.ResponseWriter, r *http.Request) {
 
 func handlerGetTaskStatus(rw http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
-	log.Println("id: ", id)
 
 	tMut.RLock()
 	t, ok := tasks[id]
@@ -192,7 +186,6 @@ func handlerGetTaskStatus(rw http.ResponseWriter, r *http.Request) {
 	if !ok {
 		e := TaskyError{"Could not found a task with given id"}
 		estr, _ := json.Marshal(e)
-		log.Println("estr: ", estr)
 		fmt.Fprintf(rw, "%s\n", estr)
 		rw.WriteHeader(http.StatusNotFound)
 		return
@@ -210,12 +203,10 @@ func handlerGetTaskStatus(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	ts := tstat{id, s, durStr}
-	log.Println("ts: ", ts)
 	jsonStr, err := json.Marshal(ts)
 	if err != nil {
 		e := TaskyError{err.Error()}
 		estr, _ := json.Marshal(e)
-		log.Println("estr: ", estr)
 		fmt.Fprintf(rw, "%s\n", estr)
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
@@ -249,13 +240,11 @@ func listTasks() ts {
 	tMut.RLock()
 	for k, v := range tasks {
 		s := v.status()
-		log.Println("s: ", s)
 
 		durStr := ""
 
 		if s != Running {
 			d := v.duration()
-			log.Println("d: ", d)
 			if d > 0 {
 				durStr = fmt.Sprintf("%v", d)
 			}
@@ -275,13 +264,11 @@ func listTasks() ts {
 
 func handlerListTasks(rw http.ResponseWriter, r *http.Request) {
 	t := listTasks()
-	log.Println("tasks: ", t)
 
 	jsonStr, err := json.Marshal(t)
 	if err != nil {
 		e := TaskyError{err.Error()}
 		estr, _ := json.Marshal(e)
-		log.Println("estr: ", estr)
 		fmt.Fprintf(rw, "%s\n", estr)
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
@@ -295,16 +282,12 @@ func handlerNewTask(rw http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		e := TaskyError{err.Error()}
 		estr, _ := json.Marshal(e)
-		log.Println("estr: ", estr)
 		fmt.Fprintf(rw, "%s\n", estr)
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	log.Println("job: ", job)
-
 	name := mux.Vars(r)["name"]
-	log.Println("name: ", name)
 
 	wMut.RLock()
 	w, ok := workers[name]
@@ -313,7 +296,6 @@ func handlerNewTask(rw http.ResponseWriter, r *http.Request) {
 	if !ok {
 		e := TaskyError{"Could not found worker with given name"}
 		estr, _ := json.Marshal(e)
-		log.Println("estr: ", estr)
 		fmt.Fprintf(rw, "%s\n", estr)
 		rw.WriteHeader(http.StatusNotFound)
 		return
@@ -324,7 +306,6 @@ func handlerNewTask(rw http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		e := TaskyError{err.Error()}
 		estr, _ := json.Marshal(e)
-		log.Println("estr: ", estr)
 		fmt.Fprintf(rw, "%s\n", estr)
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
