@@ -24,68 +24,76 @@ func (d *Ifconfig) Services() []byte {
 	return nil
 }
 
-type ifErr struct {
-	Error string
-}
-
 type ifs struct {
 	Interfaces []Ifconfig
 }
 
-func (d *Ifconfig) Perform(job []byte) ([]byte, bool) {
-	b := true
-	aflag := &b
+func (d *Ifconfig) Perform(job []byte, dataCh chan []byte, errCh chan error, quitCh chan bool) {
+	done := make(chan bool)
 
-	i := ifs{}
+	go func() {
+		b := true
 
-	ifaces, err := net.Interfaces()
-	if err != nil {
-		e := ifErr{err.Error()}
-		estr, _ := json.Marshal(e)
-		return estr, false
-	}
+		i := ifs{}
 
-	for _, iface := range ifaces {
-		addr, err := iface.Addrs()
+		ifaces, err := net.Interfaces()
 		if err != nil {
-			e := ifErr{err.Error()}
-			estr, _ := json.Marshal(e)
-			return estr, false
+			errCh <- err
+			done <- true
+			return
 		}
-		for _, ifaddr := range addr {
-			ipnet, ok := ifaddr.(*net.IPNet)
-			if !ok {
-				continue
+
+		for _, iface := range ifaces {
+			addr, err := iface.Addrs()
+			if err != nil {
+				errCh <- err
+				done <- true
+				return
 			}
-			v4 := ipnet.IP.To4()
-			if iface.Name[:2] == "lo" || v4 == nil {
-				if *aflag == false {
+			for _, ifaddr := range addr {
+				ipnet, ok := ifaddr.(*net.IPNet)
+				if !ok {
 					continue
 				}
-			}
+				v4 := ipnet.IP.To4()
+				if iface.Name[:2] == "lo" || v4 == nil {
+					if b == false {
+						continue
+					}
+				}
 
-			ii := Ifconfig{}
-			ii.Name = iface.Name
-			ii.HardwareAddr = iface.HardwareAddr.String()
-			ii.Ipnet = ipnet.String()
+				ii := Ifconfig{}
+				ii.Name = iface.Name
+				ii.HardwareAddr = iface.HardwareAddr.String()
+				ii.Ipnet = ipnet.String()
 
-			if len(i.Interfaces) <= 0 {
-				i.Interfaces = make([]Ifconfig, 1)
-				i.Interfaces[0] = ii
-			} else {
-				i.Interfaces = append(i.Interfaces, ii)
+				if len(i.Interfaces) <= 0 {
+					i.Interfaces = make([]Ifconfig, 1)
+					i.Interfaces[0] = ii
+				} else {
+					i.Interfaces = append(i.Interfaces, ii)
+				}
 			}
 		}
-	}
 
-	jsonStr, err := json.Marshal(&i)
-	if err != nil {
-		e := ifErr{err.Error()}
-		estr, _ := json.Marshal(e)
-		return estr, false
-	}
+		jsonStr, err := json.Marshal(&i)
+		if err != nil {
+			errCh <- err
+			done <- true
+			return
+		}
 
-	return jsonStr, true
+		dataCh <- jsonStr
+		done <- true
+	}()
+
+	select {
+	case <-done:
+		return
+
+	case <-quitCh:
+		return
+	}
 }
 
 func (d *Ifconfig) Status() []byte {

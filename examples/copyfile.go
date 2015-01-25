@@ -92,28 +92,35 @@ type cp struct {
 	Dst string
 }
 
-type cpErr struct {
-	Error string
-}
-
-func (d *CopyFile) Perform(job []byte) ([]byte, bool) {
+func (d *CopyFile) Perform(job []byte, dataCh chan []byte, errCh chan error, quitCh chan bool) {
 	c := cp{}
 
 	err := json.Unmarshal(job, &c)
 	if err != nil {
-		e := cpErr{err.Error()}
-		estr, _ := json.Marshal(e)
-		return estr, false
+		errCh <- err
+		return
 	}
 
-	err = cpFile(c.Src, c.Dst)
-	if err != nil {
-		e := cpErr{err.Error()}
-		estr, _ := json.Marshal(e)
-		return estr, false
-	}
+	done := make(chan bool)
+	go func() {
+		err := cpFile(c.Src, c.Dst)
+		if err != nil {
+			errCh <- err
+			done <- true
+			return
+		}
 
-	return nil, true
+		dataCh <- []byte("Filed copied successfully.")
+		done <- true
+	}()
+
+	select {
+	case <-done:
+		return
+
+	case <-quitCh:
+		return
+	}
 }
 
 func (d *CopyFile) Status() []byte {

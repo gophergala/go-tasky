@@ -26,7 +26,7 @@ type Worker interface {
 	Services() []byte
 
 	// Execute the task
-	Perform([]byte) ([]byte, bool)
+	Perform([]byte, chan []byte, chan error, chan bool)
 
 	// Worker status
 	Status() []byte
@@ -42,10 +42,14 @@ type Worker interface {
 var (
 	wMut    sync.RWMutex
 	workers map[string]Worker
+
+	tMut  sync.RWMutex
+	tasks map[string]*taskyTask
 )
 
 func init() {
 	workers = make(map[string]Worker)
+	tasks = make(map[string]*taskyTask)
 }
 
 func uuid() string {
@@ -72,8 +76,8 @@ func (tw *taskyWorker) Services() []byte {
 	return tw.w.Services()
 }
 
-func (tw *taskyWorker) Perform(job []byte) ([]byte, bool) {
-	return tw.w.Perform(job)
+func (tw *taskyWorker) Perform(job []byte, dataCh chan []byte, errCh chan error, quitCh chan bool) {
+	tw.w.Perform(job, dataCh, errCh, quitCh)
 }
 
 func (tw *taskyWorker) Status() []byte {
@@ -111,6 +115,7 @@ type ws struct {
 	Workers []worker
 }
 
+// methods for routes to invoke
 func listWorkers() ([]byte, error) {
 	w := ws{}
 
@@ -130,6 +135,31 @@ func listWorkers() ([]byte, error) {
 	wMut.RUnlock()
 
 	jsonStr, err := json.Marshal(w)
+	if err != nil {
+		return nil, err
+	}
+
+	return jsonStr, nil
+}
+
+type task struct {
+	TaskId string
+}
+
+func newTask(w Worker, job []byte) ([]byte, error) {
+	id := uuid()
+
+	t := &taskyTask{}
+	t.new(w)
+
+	tMut.Lock()
+	tasks[id] = t
+	tMut.Unlock()
+
+	go t.run(job)
+
+	tt := task{id}
+	jsonStr, err := json.Marshal(&tt)
 	if err != nil {
 		return nil, err
 	}

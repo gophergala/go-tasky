@@ -19,9 +19,21 @@ func main() {
 
 	fmt.Println("Info: ", string(tw.Info()))
 
-	e, b := tw.Perform(nil)
-	fmt.Println("e: ", string(e))
-	fmt.Println("b: ", b)
+	quitCh := make(chan bool)
+	dataCh := make(chan []byte)
+	errCh := make(chan error)
+
+	go tw.Perform(nil, dataCh, errCh, quitCh)
+
+	select {
+	case o, ok := <-dataCh:
+		if ok {
+			fmt.Println("data: ", string(o))
+		}
+
+	case e := <-errCh:
+		fmt.Println("error: ", e)
+	}
 
 	i := &Ifconfig{}
 
@@ -34,7 +46,15 @@ func main() {
 
 	fmt.Println("Info: ", string(tw2.Info()))
 
-	e, b = tw2.Perform(nil)
-	fmt.Println("e: ", string(e))
-	fmt.Println("b: ", b)
+	go tw2.Perform(nil, dataCh, errCh, quitCh)
+
+	select {
+	case o, ok := <-dataCh:
+		if ok {
+			fmt.Println("data: ", string(o))
+		}
+
+	case e := <-errCh:
+		fmt.Println("error: ", e)
+	}
 }
