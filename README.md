@@ -164,6 +164,9 @@ type Worker interface {
     // Worker name
     Name() string
 
+	// Details provides all metadata info about the worker and it's config
+	Details() *WorkerDetails
+
     // Description of the worker and it's usage
     Usage() string
 
