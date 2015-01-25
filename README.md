@@ -1,4 +1,6 @@
 #Go-Tasky
+![go-tasky-logo](https://cloud.githubusercontent.com/assets/3473592/5893581/5a90b250-a4af-11e4-84a4-1a1b14ebc54d.png)
+
 Go-Tasky is a simple go package that makes it easy to execute tasks on your server that are exposed with a RESTful api. Developed for the gophergala global hackathon 2015.  
 
 ##Basic Principles
@@ -22,7 +24,7 @@ go run main.go
 - sleeper -  Sleep and wait
 
 ##Roadmap
--serve a gui web interface alongside the api for point and click task management
+- serve a gui web interface alongside the api for point and click task management
 - expand selection of example workers
 - Chaining of tasks so you can specify a sequence of tasks to run.  
 
@@ -38,7 +40,8 @@ GET /tasky/v1/{worker_name}/statistics - returns statistics for the worker like 
 
 Tasks:  
 GET /tasky/v1/tasks/ - Returns a list of all tasks.  
-GET /tasky/v1/tasks/{id}/status - Returns the status of a task.  
+GET /tasky/v1/tasks/{id}/status - Returns the status of a task. 
+GET /tasky/v1/tasks/{id}/result - Get the output of the task.  
 POST /tasky/v1/tasks/{id}/cancel - Cancel the task.   
 
 TODO:  
