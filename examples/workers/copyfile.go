@@ -12,19 +12,35 @@ import (
 type CopyFile struct {
 }
 
-func (d *CopyFile) Info() []byte {
-	s := `{
-		"Usage": {
-			"src":"<source file>",
-			"dst":"<destination file>"
-		}
-	}`
-
-	return []byte(s)
+type cp struct {
+	Src string
+	Dst string
 }
 
-func (d *CopyFile) Services() []byte {
-	return nil
+type cpUsage struct {
+	Usage cp
+}
+
+type cpError struct {
+	Error string
+}
+
+func (d *CopyFile) Name() string {
+	return "CopyFile"
+}
+
+func (d *CopyFile) Usage() string {
+	c := cp{"<source file>", "destination file>"}
+	u := cpUsage{c}
+
+	jsonStr, err := json.Marshal(u)
+	if err != nil {
+		e := cpError{err.Error()}
+		estr, _ := json.Marshal(e)
+		return string(estr)
+	}
+
+	return string(jsonStr)
 }
 
 // cpFile copies a file from src to dst. If src and dst files exist, and are
@@ -87,11 +103,6 @@ func cpFileContents(src, dst string) (err error) {
 	return
 }
 
-type cp struct {
-	Src string
-	Dst string
-}
-
 func (d *CopyFile) Perform(job []byte, dataCh chan []byte, errCh chan error, quitCh chan bool) {
 	c := cp{}
 
@@ -123,14 +134,14 @@ func (d *CopyFile) Perform(job []byte, dataCh chan []byte, errCh chan error, qui
 	}
 }
 
-func (d *CopyFile) Status() []byte {
-	return nil
+func (d *CopyFile) Status() string {
+	return tasky.Enabled
 }
 
 func (d *CopyFile) Signal(act tasky.Action) bool {
 	return true
 }
 
-func (d *CopyFile) Statistics() []byte {
-	return nil
+func (d *CopyFile) MaxNumTasks() uint64 {
+	return 10
 }

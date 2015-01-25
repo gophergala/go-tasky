@@ -5,12 +5,13 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gophergala/go-tasky/examples/workers"
 	"github.com/gophergala/go-tasky/tasky"
 	"github.com/gorilla/mux"
 )
 
 func register() {
-	cp := &CopyFile{}
+	cp := &workers.CopyFile{}
 
 	tw, err := tasky.NewWorker(cp)
 	if err != nil {
@@ -19,7 +20,7 @@ func register() {
 	fmt.Println("cp: ", tw)
 	fmt.Println("info: ", string(tw.Usage()))
 
-	i := &Ifconfig{}
+	i := &workers.Ifconfig{}
 
 	tw2, err := tasky.NewWorker(i)
 	if err != nil {
@@ -27,7 +28,7 @@ func register() {
 	}
 	fmt.Println("i: ", tw2)
 
-	s := &Sleeper{}
+	s := &workers.Sleeper{}
 
 	tw3, err := tasky.NewWorker(s)
 	if err != nil {
