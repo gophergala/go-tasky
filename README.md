@@ -3,15 +3,22 @@
 <img src="https://cloud.githubusercontent.com/assets/3473592/5893581/5a90b250-a4af-11e4-84a4-1a1b14ebc54d.png" alt="go-tasky-logo"/>
 </p>
 
-Go-Tasky is a simple golang package that makes it easy to create and execute tasks on a server that are exposed with a RESTful api.  Think of Go-Tasky as your drop-in server companion tool, for when you need to expose the information you need via friendly APIs.
+Go-Tasky is a simple golang package that makes it easy to create and execute tasks on a server or in a Docker container that are exposed with a RESTful api.  Think of Go-Tasky as your drop-in server companion tool, for when you need to expose information or run remote tasks via friendly APIs.  
 
 Developed by [Mark Moudy](https://github.com/MarkMoudy) and [Mehul Choube](https://github.com/mchoube) during the 2015 Gophergala global hackathon.  
 
 ##Basic Principles
 
-Register a task with go-tasky that implements the worker interface and a set of routes will be created for that task. You can have any number of uniquely configured tasks for a worker. Go-Tasky runs on your server and expose api endpoints. 
+Register a custom worker with Go-Tasky that implements the worker interface and a set of routes will be created for that task. You can have any number of uniquely configured tasks for a worker. Go-Tasky runs on your server and gives you a customizable interface to build your toolkit for servers and containers. 
 
-##Getting Started
+## Example Workers
+- CopyFile - copy a file to a new location  
+- Ifconfig - fetch network information read the contents of a file  
+- Sleeper -  Sleep and wait
+
+##Usage
+
+###Getting Started
 Install Go-Tasky in your $GOPATH with `go get`  
 ```Go
 go get -u github.com/gophergala/go-tasky
@@ -22,39 +29,28 @@ Navigate to the examples directory and run
 go run main.go 
 ```
 
-## Example Workers
-- CopyFile - copy a file to a new location  
-- Ifconfig - fetch network information read the contents of a file  
-- sleeper -  Sleep and wait
-
-##Roadmap
-- serve a gui web interface alongside the api for point and click task management
-- expand selection of example workers
-- Chaining of tasks so you can specify a sequence of tasks to run.  
-
-##Routes
-
+###Routes
 Workers:  
 GET /tasky/v1/workers/ - returns a list of available worker endpoints   
 POST /tasky/v1/workers/{worker_name} - Creates a task to run.  
-
-TODO:  
-GET /tasky/v1/workers/{worker_name}/info - returns a description of the worker and it's usage   
-GET /tasky/v1/{worker_name}/statistics - returns statistics for the worker like number of tasks performed, failure rate, average time take per task etc  
 
 Tasks:  
 GET /tasky/v1/tasks/ - Returns a list of all tasks.  
 GET /tasky/v1/tasks/{id}/status - Returns the status of a task. 
 GET /tasky/v1/tasks/{id}/result - Get the output of the task.  
-POST /tasky/v1/tasks/{id}/cancel - Cancel the task.   
+POST /tasky/v1/tasks/{id}/cancel - Cancel the task. 
 
-TODO:  
-PUT /tasky/v1/task/{task_id} - Update the configuration of the task.  
-POST /tasky/v1/task/{task_id}/actions - Modify the state of the task (cancel, pause, resume, run)  
-GET /tasky/v1/task/{task_id}/statistics - returns the statistics about the task, such as time to complete task  
+###Creating a Custom Worker
 
-RuleChains:  
-For later, but used to chain multiple tasks together in an ordered fashion.  
+### Adding to your code
+
+
+##Roadmap
+- Serve a gui web interface alongside the api for point and click task management
+- Expand selection of example workers
+- Task Chaining so you can specify a sequence of tasks to run. 
+- Authentication to secure access. 
+
 
 ## Example
 List available workers:  
@@ -67,15 +63,15 @@ curl http://localhost:8888/tasky/v1/workers/ | python -mjson.tool
             "source": ""
         },
         "description": "CopyFile will copy a file on the server. You must specify the Source and Destination",
-        "name": "CopyFile"
+        "name": "copyfile"
     },
     {
         "description": "Ifconfig will return networking details from the server. No config is needed for this worker",
-        "name": "Ifconfig"
+        "name": "ifconfig"
     },
     {
         "description": "Sleeps for a minute. This is to showcase long running tasks.",
-        "name": "Sleeper"
+        "name": "sleeper"
     }
 ]
 ```
