@@ -20,7 +20,7 @@ const (
 
 type Worker interface {
 	// Description of the worker and it's usage
-	Info() []byte
+	Info() string
 
 	// List of available tasks it can service
 	Services() []byte
@@ -68,7 +68,7 @@ type taskyWorker struct {
 	w  Worker
 }
 
-func (tw *taskyWorker) Info() []byte {
+func (tw *taskyWorker) Info() string {
 	return tw.w.Info()
 }
 
@@ -108,7 +108,7 @@ func NewWorker(w Worker) (Worker, error) {
 
 type worker struct {
 	Id   string
-	Info []byte
+	Info string
 }
 
 type ws struct {

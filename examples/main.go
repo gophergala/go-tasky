@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/gophergala/go-tasky/tasky"
+	"github.com/gorilla/mux"
 )
 
 func register() {
@@ -15,6 +17,7 @@ func register() {
 		log.Fatalf("error: %v", err)
 	}
 	fmt.Println("cp: ", tw)
+	fmt.Println("info: ", string(tw.Info()))
 
 	i := &Ifconfig{}
 
@@ -35,4 +38,10 @@ func register() {
 
 func main() {
 	register()
+
+	r := mux.NewRouter()
+
+	tasky.RegisterTaskyHandlers(r)
+
+	http.ListenAndServe(":12345", r)
 }

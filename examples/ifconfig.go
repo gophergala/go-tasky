@@ -13,11 +13,10 @@ type Ifconfig struct {
 	Ipnet        string
 }
 
-func (d *Ifconfig) Info() []byte {
-	s := `{
-	}`
+func (d *Ifconfig) Info() string {
+	s := "{\"Usage\":{}}"
 
-	return []byte(s)
+	return s
 }
 
 func (d *Ifconfig) Services() []byte {

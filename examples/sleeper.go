@@ -9,13 +9,10 @@ import (
 type Sleeper struct {
 }
 
-func (d *Sleeper) Info() []byte {
-	s := `{
-		"Usage": {
-		}
-	}`
+func (d *Sleeper) Info() string {
+	s := "{\"Usage\":{}}"
 
-	return []byte(s)
+	return s
 }
 
 func (d *Sleeper) Services() []byte {

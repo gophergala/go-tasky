@@ -12,15 +12,10 @@ import (
 type CopyFile struct {
 }
 
-func (d *CopyFile) Info() []byte {
-	s := `{
-		"Usage": {
-			"src":"<source file>",
-			"dst":"<destination file>"
-		}
-	}`
+func (d *CopyFile) Info() string {
+	s := "{\"Usage\":{\"src\":\"<source file>\",\"dst\":\"<destination file>\"}}"
 
-	return []byte(s)
+	return s
 }
 
 func (d *CopyFile) Services() []byte {
