@@ -34,6 +34,10 @@ func (t *taskyTask) new(w Worker) {
 }
 
 func (t *taskyTask) run(job []byte) {
+	if t.stat != Started {
+		return
+	}
+
 	t.stat = Running
 	t.quit = make(chan bool)
 	q := make(chan bool)
