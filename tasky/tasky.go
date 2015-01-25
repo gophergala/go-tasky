@@ -135,13 +135,17 @@ func handlerGetTaskOutput(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	output := string(t.result())
-
-	if len(output) > 0 {
+	if len(t.result()) > 0 {
+		results := make(map[string]interface{})
+		err := json.Unmarshal(t.result(), &results)
+		if err != nil {
+			log.Println("Tasky.go_handlerGetTaskOutput - Error Unmarshaling Task Result: ", err.Error())
+			results["string_output"] = string(t.result()) //last ditch effort to save the data
+		}
 		js := make(map[string]interface{})
 
 		js["TaskId"] = id
-		js["Output"] = output
+		js["Output"] = results
 
 		jsonStr, err := json.Marshal(js)
 		if err != nil {
