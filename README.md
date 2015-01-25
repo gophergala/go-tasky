@@ -152,11 +152,6 @@ curl http://localhost:8888/tasky/v1/tasks/ | python -mjson.tool
 
 Get Result of a task:  
 ```go
-curl -X POST -H "Content-Type: application/json" -d '{}' http://localhost:8888/tasky/v1/workers/ifconfig | python -mjson.tool
-{
-    "TaskId": "ac2d1192bd4d46e48207956554aa230f"
-}
-
 curl http://localhost:8888/tasky/v1/tasks/1acb0ad6c8fb4d4faa7aa0e1d0f5f0b6/result 
 {
     "Output": {
