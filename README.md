@@ -49,23 +49,20 @@ For later, but used to chain multiple tasks together in an ordered fashion.
 List of workers available:  
 ```go
 curl http://localhost:8888/tasky/v1/workers/ | python -mjson.tool 
-{
-    "workers": [
-        {
-            "name": "copyfile",
-            "usage": "{\"Usage\":{\"Src\":\"\\u003csource file\\u003e\",\"Dst\":\"destination file\\u003e\"}}"
+[
+    {
+        "config_objects": {
+            "destination": "",
+            "source": ""
         },
-        {
-            "name": "ifconfig",
-            "usage": "{\"Usage\":{}}"
-        },
-        {
-            "name": "sleeper",
-            "usage": "{\"Usage\":{}}"
-        }
-    ]
-}
-
+        "description": "CopyFile will copy a file on the server. You must specify the Source and Destination",
+        "name": "CopyFile"
+    },
+    {
+        "description": "Ifconfig will return networking details from the server. No config is needed for this worker",
+        "name": "Ifconfig"
+    }
+]
 ```
 
 ## Worker Interface
