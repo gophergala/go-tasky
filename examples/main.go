@@ -7,33 +7,14 @@ import (
 	"github.com/gophergala/go-tasky/tasky"
 )
 
-func main() {
+func register() {
 	cp := &CopyFile{}
 
 	tw, err := tasky.NewWorker(cp)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
-
 	fmt.Println("cp: ", tw)
-
-	fmt.Println("Info: ", string(tw.Info()))
-
-	quitCh := make(chan bool)
-	dataCh := make(chan []byte)
-	errCh := make(chan error)
-
-	go tw.Perform(nil, dataCh, errCh, quitCh)
-
-	select {
-	case o, ok := <-dataCh:
-		if ok {
-			fmt.Println("data: ", string(o))
-		}
-
-	case e := <-errCh:
-		fmt.Println("error: ", e)
-	}
 
 	i := &Ifconfig{}
 
@@ -41,20 +22,17 @@ func main() {
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
-
 	fmt.Println("i: ", tw2)
 
-	fmt.Println("Info: ", string(tw2.Info()))
+	s := &Sleeper{}
 
-	go tw2.Perform(nil, dataCh, errCh, quitCh)
-
-	select {
-	case o, ok := <-dataCh:
-		if ok {
-			fmt.Println("data: ", string(o))
-		}
-
-	case e := <-errCh:
-		fmt.Println("error: ", e)
+	tw3, err := tasky.NewWorker(s)
+	if err != nil {
+		log.Fatalf("error: %v", err)
 	}
+	fmt.Println("s: ", tw3)
+}
+
+func main() {
+	register()
 }
