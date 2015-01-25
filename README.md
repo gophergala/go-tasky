@@ -45,20 +45,29 @@ For later, but used to chain multiple tasks together in an ordered fashion.
 The worker interface corresponds to an individual worker type
 ```go
 type Worker interface {
-    //provides a description and usage instructions for the worker
-    Info()
+    // Description of the worker and it's usage
+	Info() string
     
-    //implements the logic to create a new worker(config, etc)
-    Create()
+
+	// List of available tasks it can service
+	Services() string
     
-    //returns status of the worker
-    Status()
 
-    //controls to modify the state of the task(start, cancel, pause, resume)
-    Update()
+	// Execute the task
+	Perform() (string, bool)
+    
 
-    //cleanup tasks when removing the task
-    Delete()
+	// Worker status
+	Status() string
+    
+
+	// Action to be taken on ongoing task
+	Signal(Action) bool
+    
+
+	// Worker statistics like number of tasks performed, failure rate,
+	// avaerage time per task etc
+	Statistics() string
 }
 ```
 
