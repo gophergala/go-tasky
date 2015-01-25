@@ -19,8 +19,12 @@ go run main.go
 ## Example Workers
 - CopyFile - copy a file to a new location  
 - Ifconfig - fetch network information read the contents of a file  
-- sleeper -  Sleep and wait?
-- check the values of system settings  
+- sleeper -  Sleep and wait
+
+##Roadmap
+-serve a gui web interface alongside the api for point and click task management
+- expand selection of example workers
+- Chaining of tasks so you can specify a sequence of tasks to run.  
 
 ##Routes
 
