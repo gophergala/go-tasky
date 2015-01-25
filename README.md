@@ -50,7 +50,7 @@ RuleChains:
 For later, but used to chain multiple tasks together in an ordered fashion.  
 
 ## Example
-List of workers available:  
+List available workers:  
 ```go
 curl http://localhost:8888/tasky/v1/workers/ | python -mjson.tool 
 [
