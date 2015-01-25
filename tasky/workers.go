@@ -1,52 +1,138 @@
 package tasky
 
 import (
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
-	"net/http"
+	"io"
+	"log"
 	"sync"
 )
 
-//Worker is an interface for defining a worker type.  All custom workers must implement this interface.
-type Workers struct {
-	sync.RWMutex
-	Store map[string]*Worker
+type Action uint64
+
+const (
+	Cancel Action = iota
+	Pause
+	Resume
+	Restart
+)
+
+type Worker interface {
+	// Description of the worker and it's usage
+	Info() []byte
+
+	// List of available tasks it can service
+	Services() []byte
+
+	// Execute the task
+	Perform([]byte) ([]byte, bool)
+
+	// Worker status
+	Status() []byte
+
+	// Action to be taken on ongoing task
+	Signal(Action) bool
+
+	// Worker statistics like number of tasks performed, failure rate,
+	// average time per task etc
+	Statistics() []byte
 }
 
-type Worker struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
+var (
+	wMut    sync.RWMutex
+	workers map[string]Worker
+)
+
+func init() {
+	workers = make(map[string]Worker)
 }
 
-func (workers *Workers) CreateWorker(worker *Worker) {
-	workers.Lock()
-	id := fmt.Sprintf("%d", len(workers.Store)) //replace this with database backing id, temp for now
-	worker.ID = id
-	workers.Store[id] = worker
-	workers.Unlock()
-}
-
-func (workers *Workers) Index(w http.ResponseWriter, req *http.Request) {
-	if len(workers.Store) == 0 {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNoContent)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	RespondJSON(w, req, workers.Store)
-
-}
-
-func RespondJSON(w http.ResponseWriter, req *http.Request, v interface{}, code ...int) error {
-	if code != nil {
-		w.WriteHeader(code[0])
-	}
-	err := json.NewEncoder(w).Encode(v)
+func uuid() string {
+	b := make([]byte, 16)
+	_, err := io.ReadFull(rand.Reader, b)
 	if err != nil {
-		//encoding failed
-		panic(err)
+		log.Fatal(err)
+	}
+	b[6] = (b[6] & 0x0F) | 0x40
+	b[8] = (b[8] &^ 0x40) | 0x80
+	return fmt.Sprintf("%x%x%x%x%x", b[:4], b[4:6], b[6:8], b[8:10], b[10:])
+}
+
+type taskyWorker struct {
+	Id string
+	w  Worker
+}
+
+func (tw *taskyWorker) Info() []byte {
+	return tw.w.Info()
+}
+
+func (tw *taskyWorker) Services() []byte {
+	return tw.w.Services()
+}
+
+func (tw *taskyWorker) Perform(job []byte) ([]byte, bool) {
+	return tw.w.Perform(job)
+}
+
+func (tw *taskyWorker) Status() []byte {
+	return tw.w.Status()
+}
+
+func (tw *taskyWorker) Signal(act Action) bool {
+	return tw.w.Signal(act)
+}
+
+func (tw *taskyWorker) Statistics() []byte {
+	return tw.w.Statistics()
+}
+
+func NewWorker(w Worker) (Worker, error) {
+	tw := &taskyWorker{}
+
+	tw.Id = uuid()
+
+	tw.w = w
+
+	wMut.Lock()
+	workers[tw.Id] = tw
+	wMut.Unlock()
+
+	return tw, nil
+}
+
+type worker struct {
+	Id   string
+	Info []byte
+}
+
+type ws struct {
+	Workers []worker
+}
+
+func listWorkers() ([]byte, error) {
+	w := ws{}
+
+	wMut.RLock()
+	for k, v := range workers {
+		t := worker{}
+		t.Id = k
+		t.Info = v.Info()
+
+		if len(w.Workers) <= 0 {
+			w.Workers = make([]worker, 1)
+			w.Workers[0] = t
+		} else {
+			w.Workers = append(w.Workers, t)
+		}
+	}
+	wMut.RUnlock()
+
+	jsonStr, err := json.Marshal(w)
+	if err != nil {
+		return nil, err
 	}
 
-	return err
+	return jsonStr, nil
 }
