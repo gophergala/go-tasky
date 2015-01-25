@@ -3,9 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/davecgh/go-spew/spew"
 	"log"
 	"net/http"
+
+	"github.com/davecgh/go-spew/spew"
 
 	"github.com/gophergala/go-tasky/examples/workers"
 	"github.com/gophergala/go-tasky/tasky"
@@ -40,14 +41,13 @@ func register() {
 	}
 	fmt.Println("i: ", tw2)
 
-	// s := &workers.Sleeper{}
+	s := &workers.Sleeper{}
 
-	// tw3, err := tasky.NewWorker(s)
-	// if err != nil {
-	// 	log.Fatalf("error: %v", err)
-	// }
-	// fmt.Println("s: ", tw3)
-	// return
+	tw3, err := tasky.NewWorker(s)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+	fmt.Println("s: ", tw3)
 }
 
 func main() {

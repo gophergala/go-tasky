@@ -61,8 +61,100 @@ curl http://localhost:8888/tasky/v1/workers/ | python -mjson.tool
     {
         "description": "Ifconfig will return networking details from the server. No config is needed for this worker",
         "name": "Ifconfig"
+    },
+    {
+        "description": "Sleeps for a minute. This is to showcase long running tasks.",
+        "name": "Sleeper"
     }
 ]
+```
+
+Submit a task:  
+```go
+curl -X POST -H "Content-Type: application/json" -d '{}' http://localhost:8888/tasky/v1/workers/sleeper | python -mjson.tool
+{
+    "TaskId": "fe965d7a2b14471c8339b555f0f51014"
+}
+
+curl -X POST -H "Content-Type: application/json" -d '{}' http://localhost:8888/tasky/v1/workers/sleeper | python -mjson.tool
+{
+    "TaskId": "594a8e2fad2247328521a9d85066c627"
+}
+
+curl -X POST -H "Content-Type: application/json" -d '{}' http://localhost:8888/tasky/v1/workers/sleeper | python -mjson.tool
+{
+    "TaskId": "96ac00d2f3c343e9a301cd9236497cf8"
+}
+```
+
+List all tasks:  
+```go
+curl http://localhost:8888/tasky/v1/tasks/ | python -mjson.tool 
+{
+    "Tasks": [
+        {
+            "Duration": "1m0.000260498s",
+            "Status": "Completed",
+            "TaskId": "749ef2a6c47c4493836bebe412f2cd8a"
+        },
+        {
+            "Duration": "1m0.00034707s",
+            "Status": "Completed",
+            "TaskId": "3d8946e02fa34517a093ed46f84323fc"
+        },
+        {
+            "Duration": "1m0.00013859s",
+            "Status": "Completed",
+            "TaskId": "ab6b3d680e324ecb8c60bcec118d2a7c"
+        },
+        {
+            "Status": "Running",
+            "TaskId": "fe965d7a2b14471c8339b555f0f51014"
+        },
+        {
+            "Status": "Running",
+            "TaskId": "594a8e2fad2247328521a9d85066c627"
+        },
+        {
+            "Status": "Running",
+            "TaskId": "96ac00d2f3c343e9a301cd9236497cf8"
+        }
+    ]
+}
+```
+
+Cancel a task:  
+```go
+curl -X POST http://localhost:8888/tasky/v1/tasks/96ac00d2f3c343e9a301cd9236497cf8/cancel | python -mjson.tool
+
+curl http://localhost:8888/tasky/v1/tasks/ | python -mjson.tool 
+{
+    "Tasks": [
+        {
+            "Status": "Running",
+            "TaskId": "fe965d7a2b14471c8339b555f0f51014"
+        },
+        {
+            "Status": "Running",
+            "TaskId": "594a8e2fad2247328521a9d85066c627"
+        },
+        {
+            "Status": "Canceled",
+            "TaskId": "96ac00d2f3c343e9a301cd9236497cf8"
+        }
+    ]
+}
+```
+
+Get Result of a task:  
+```go
+curl -X POST -H "Content-Type: application/json" -d '{}' http://localhost:8888/tasky/v1/workers/ifconfig | python -mjson.tool
+{
+    "TaskId": "1acb0ad6c8fb4d4faa7aa0e1d0f5f0b6"
+}
+
+curl http://localhost:8888/tasky/v1/tasks/1acb0ad6c8fb4d4faa7aa0e1d0f5f0b6/result 
+{"Output":"{\"Interfaces\":[{\"interface_name\":\"lo\",\"mac_address\":\"\",\"ip_network\":\"127.0.0.1/8\"},{\"interface_name\":\"lo\",\"mac_address\":\"\",\"ip_network\":\"::1/128\"},{\"interface_name\":\"eth0\",\"mac_address\":\"f0:de:f1:4c:3a:ee\",\"ip_network\":\"172.24.20.26/23\"},{\"interface_name\":\"eth0\",\"mac_address\":\"f0:de:f1:4c:3a:ee\",\"ip_network\":\"fe80::f2de:f1ff:fe4c:3aee/64\"}]}","TaskId":"1acb0ad6c8fb4d4faa7aa0e1d0f5f0b6"}
 ```
 
 ## Worker Interface

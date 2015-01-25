@@ -20,6 +20,7 @@ func (d *Ifconfig) Details() *tasky.WorkerDetails {
 		Config:      nil,
 	}
 }
+
 func (d *Ifconfig) Name() string {
 	return "Ifconfig"
 }

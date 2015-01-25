@@ -9,6 +9,14 @@ import (
 type Sleeper struct {
 }
 
+func (d *Sleeper) Details() *tasky.WorkerDetails {
+	return &tasky.WorkerDetails{
+		Name:        "Sleeper",
+		Description: "Sleeps for a minute. This is to showcase long running tasks.",
+		Config:      nil,
+	}
+}
+
 func (d *Sleeper) Name() string {
 	return "Sleeper"
 }
