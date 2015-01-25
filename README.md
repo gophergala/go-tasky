@@ -16,87 +16,54 @@ Navigate to the examples directory and run
 go run main.go 
 ```
 
-##Workers
-- copy a file to a new location  
-- read the contents of a file  
-- check the values of system settings 
-- !TODO add more!  
-
-##Use Case Example
-Use this tool when debugging or checking values on your system.
+## Example Workers
+- CopyFile - copy a file to a new location  
+- Ifconfig - fetch network information read the contents of a file  
+- sleeper -  Sleep and wait?
+- check the values of system settings  
 
 ##Routes
+
 Workers:  
-POST /tasky/v1/worker/register - registers a worker with go-tasky   
-GET /tasky/v1/workers - returns a list of available worker endpoints   
-GET /tasky/v1/workers/{worker_name} - returns a list of available tasks to run  
+GET /tasky/v1/workers/ - returns a list of available worker endpoints   
+POST /tasky/v1/workers/{worker_name} - Creates a task to run.  
+
+TODO:
 GET /tasky/v1/workers/{worker_name}/info - returns a description of the worker and it's usage   
-POST /tasky/v1/workers/{worker_name} - Creates a new task to run with the worker and returns a unique task id  
-GET /tasky/v1/{worker_name}/statistics - returns statistics for the worker like number of tasks performed, failure rate, avearge time take per task etc
+GET /tasky/v1/{worker_name}/statistics - returns statistics for the worker like number of tasks performed, failure rate, average time take per task etc  
 
 Tasks:  
-GET /tasky/v1/task/{task_id} - Fetch details of a single task.  
+GET /tasky/v1/tasks/ - Returns a list of all tasks.  
+GET /tasky/v1/tasks/{id}/status - Returns the status of a task.  
+
+TODO:
 PUT /tasky/v1/task/{task_id} - Update the configuration of the task.  
-
 POST /tasky/v1/task/{task_id}/actions - Modify the state of the task (cancel, pause, resume, run)  
-GET /tasky/v1/task/{task_id}/status - returns the status of the task  
 GET /tasky/v1/task/{task_id}/statistics - returns the statistics about the task, such as time to complete task  
-
-
-PUT /tasky/v1/task/{task_id} - Modify the state of the task (cancel, pause, resume, rerun)   
-GET /tasky/v1/task/{task_id}/status - returns the status of the task   
-GET /tasky/v1/task/{task_id}/statistics - returns the statistics about a task like time it took to complete the task etc   
 
 RuleChains:  
 For later, but used to chain multiple tasks together in an ordered fashion.  
 
 ## Worker Interface
-The worker interface corresponds to an individual worker type
+Create a custom worker by implementing the worker interface:  
 ```go
 type Worker interface {
+    // Worker name
+    Name() string
+
     // Description of the worker and it's usage
-	Info() string
-    
+    Usage() string
 
-	// List of available tasks it can service
-	Services() string
-    
+    // Execute the task
+    Perform([]byte, chan []byte, chan error, chan bool)
 
-	// Execute the task
-	Perform() (string, bool)
-    
+    // Worker status
+    Status() string
 
-	// Worker status
-	Status() string
-    
+    // Action to be taken on ongoing task
+    Signal(Action) bool
 
-	// Action to be taken on ongoing task
-	Signal(Action) bool
-    
-
-	// Worker statistics like number of tasks performed, failure rate,
-	// avaerage time per task etc
-	Statistics() string
+    // Maximum number of simultaneous tasks allowed
+    MaxNumTasks() uint64
 }
-```
-
-
-## Task Interface
-The task interface corresponds to details about a specific task running with a worker.  
-```go
-type Task interface {
-    // logic to create a new task, called from the worker create endpoint
-    Create()
-
-    // returns the details of an individual task 
-    Read(*Context)
-
-    // modify the configuration of an individual task
-    Update(*Context)
-
-    // delete an individual task
-    Delete(*Context)
-
-}
-
 ```
