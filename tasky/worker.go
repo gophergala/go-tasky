@@ -3,8 +3,7 @@ package tasky
 import (
 	"encoding/json"
 	"errors"
-
-	"github.com/davecgh/go-spew/spew"
+	"strings"
 )
 
 type taskyWorker struct {
@@ -58,8 +57,8 @@ func listWorkerDetails() ([]WorkerDetails, error) {
 	workersDetailList := make([]WorkerDetails, len(workers))
 	i := 0
 	for _, wdetails := range workers {
-		spew.Dump(wdetails)
 		workersDetailList[i] = *wdetails.Details()
+		workersDetailList[i].Name = strings.ToLower(wdetails.Details().Name)
 		i++
 	}
 	wMut.RUnlock()
